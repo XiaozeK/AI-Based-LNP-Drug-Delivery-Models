@@ -182,4 +182,32 @@ X_filtered = select_features(X, train_y_train, n_jobs=3)
 print('X_filtered shape=')
 print(X_filtered.shape)
 
-p
+print('extracting selected features for ALL training data')
+X_train_filtered = extract_features(X0_train, column_id='id', column_sort='time',
+                                    kind_to_fc_parameters=settings.from_columns(X_filtered.columns),
+                                    impute_function=impute, n_jobs=3)
+
+print('X_train_filtered shape=')
+print(X_train_filtered.shape)
+
+
+print('extracting selected features for test data')
+X_test_filtered = extract_features(X0_test, column_id='id', column_sort='time',
+                                   kind_to_fc_parameters=settings.from_columns(X_filtered.columns),
+                                   impute_function=impute, n_jobs=3)
+
+print('X_test_filtered shape=')
+print(X_test_filtered.shape)
+
+print('running PCA')
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+pca_train = PCAForPandas(n_components=n_latent)
+X_train_pca = pca_train.fit_transform(X_train_filtered)
+X_test_pca = pca_train.transform(X_test_filtered)
+
+
+X_train_pca.to_csv('/scratch-shared/phil/LNP/LNP_data_09/tsfresh_efficient_pca_train_features_' + fit_method + '_' + fold + '.csv')
+X_test_pca.to_csv('/scratch-shared/phil/LNP/LNP_data_09/tsfresh_efficient_pca_test_features_' + fit_method + '_' + fold + '.csv')
+
+print('FINISHED!')
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
